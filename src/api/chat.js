@@ -15,7 +15,4 @@ export const voiceChat = (formData) =>
 
 
 
-export const tts = (data) =>
-  apiClient.post("/voice/tts", data)
-
 

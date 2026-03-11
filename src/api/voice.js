@@ -27,8 +27,22 @@ export const generateAudio2 = (data) =>
 
 
 
+export const tts = (data) =>
+  apiClient.post("/voice/cosyvoice_tts", data,{
+    timeout: 300000,
+  })
 
 
+
+// 获取20个声音
+export const getGreatVoices = (params = {}) => {
+  return apiClient.get('/voice/voices', {
+    params: {
+      skip: params.skip || 0,
+      limit: params.limit || 20
+    }
+  })
+}
 
 
 

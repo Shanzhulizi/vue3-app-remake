@@ -70,7 +70,7 @@ import { ref, onMounted, computed, nextTick, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { chat } from '@/api/chat'
-import { tts } from '@/api/chat'
+import { tts } from '@/api/voice'
 import { fetchStream } from '@/api/stream'
 import { getCharacterDetail } from '@/api/character'
 import { getHistoryConversation } from '@/api/conversation'
@@ -194,13 +194,13 @@ const sendText = async () => {
 const playTTS = async (text) => {
 
   stopAudio()
-  const voice_code= character.value.voice_code
+  const voice_id= character.value.voice_id
   console.log(character.value)
-  console.log('🎤 请求TTS接口，文本:', text, '角色ID:', characterId, '声音代码:', voice_code)
+  console.log('🎤 请求TTS接口，文本:', text, '角色ID:', characterId, '声音ID:', voice_id)
   const res = await tts({
     text,
     // character_id: characterId,
-    voice_code: voice_code
+    voice_id: voice_id
   })
   console.log('audio_url:', res.data.data.audio_url  )
   audioPlayer = new Audio(res.data.data.audio_url)
