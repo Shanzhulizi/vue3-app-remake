@@ -157,7 +157,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { createVoice, getVoices, generateAudio } from '@/api/cosyvoice'  // 导入API函数
+import { createVoice, getVoices, generateAudio, generateAudio2} from '@/api/voice'  // 导入API函数
 
 // 标签页状态
 const activeTab = ref('create')

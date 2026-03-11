@@ -157,7 +157,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { createVoice, getVoices, generateAudio } from '@/api/cosyvoice2'  // 导入API函数
+import { createVoice, getVoices, generateAudio, generateAudio2} from '@/api/voice'  // 导入API函数
 
 // 标签页状态
 const activeTab = ref('create')
@@ -284,7 +284,7 @@ const handleGenerateAudio = async () => {
 
   try {
     // 使用抽离出来的 API 函数
-    const response = await generateAudio({
+    const response = await generateAudio2({
       voice_id: selectedVoiceId.value,
       text: generateText.value
     })
