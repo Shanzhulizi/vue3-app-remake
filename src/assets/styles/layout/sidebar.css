@@ -1,0 +1,141 @@
+/* =========================
+   Sidebar 容器
+========================= */
+
+.sidebar {
+  width: 220px;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px;
+}
+
+/* =========================
+   上半部分
+========================= */
+
+.sidebar-top {
+  flex: 1;
+}
+
+/* 品牌 / Logo */
+
+.brand {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 20px;
+  color: #111827;
+}
+
+/* =========================
+   主导航
+========================= */
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-item {
+  padding: 10px 12px;
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+  color: #374151;
+
+  transition: background-color 0.15s ease,
+              color 0.15s ease;
+}
+
+.nav-item:hover {
+  background: #f3f4f6;
+}
+
+.nav-item.active {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+/* =========================
+   底部菜单
+========================= */
+
+.sidebar-bottom {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menu-item {
+  padding: 10px 12px;
+  border-radius: 8px;
+
+  font-size: 14px;
+  cursor: pointer;
+  color: #374151;
+
+  transition: background-color 0.15s ease;
+}
+
+.menu-item:hover {
+  background: #f3f4f6;
+}
+
+/* 危险操作（退出） */
+
+.menu-item.danger {
+  color: #ef4444;
+}
+
+.menu-item.danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+
+/* ===== 创建入口 ===== */
+
+.nav-item.create {
+  position: relative;
+}
+
+/* 右侧弹出菜单 */
+.create-menu {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 8px);
+
+  width: 120px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 6px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+}
+
+.create-item {
+  padding: 8px 10px;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #374151;
+}
+
+.create-item:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
