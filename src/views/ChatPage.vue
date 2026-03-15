@@ -3,14 +3,9 @@
 
     <!-- 角色信息 -->
     <header class="chat-header">
-      <img 
-      v-if="character.avatar" 
-      :src="character.avatar" 
-      :alt="character.name" 
-      class="avatar-img"  
-      @error="handleImageError" 
-    />
-    <span v-else class="avatar-text">{{ avatarChar }}</span>
+      <img v-if="character.avatar" :src="character.avatar" :alt="character.name" class="avatar-img"
+        @error="handleImageError" />
+      <span v-else class="avatar-text">{{ avatarChar }}</span>
       <div class="info">
         <div class="name">{{ character.name }}</div>
         <div class="desc">{{ character.description }}</div>
@@ -194,7 +189,7 @@ const sendText = async () => {
 const playTTS = async (text) => {
 
   stopAudio()
-  const voice_id= character.value.voice_id
+  const voice_id = character.value.voice_id
   console.log(character.value)
   console.log('🎤 请求TTS接口，文本:', text, '角色ID:', characterId, '声音ID:', voice_id)
   const res = await tts({
@@ -202,13 +197,127 @@ const playTTS = async (text) => {
     // character_id: characterId,
     voice_id: voice_id
   })
-  console.log('audio_url:', res.data.data.audio_url  )
+  console.log('audio_url:', res.data.data.audio_url)
   audioPlayer = new Audio(res.data.data.audio_url)
 
   audioPlayer.play()
 
 }
+const playTTSStream = async (text) => {
+  stopAudio()
 
+  const voice_id = character.value.voice_id
+  console.log('🎤 请求流式TTS接口，文本:', text)
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/voice/cosyvoice_tts_stream", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, voice_id }),
+    })
+
+    if (!response.ok) throw new Error('TTS请求失败')
+
+    const reader = response.body.getReader()
+    
+    // 先读取WAV header
+    const headerResult = await reader.read()
+    const headerData = headerResult.value
+    console.log('WAV header:', headerData.byteLength, 'bytes')
+    
+    // 解析WAV header
+    const view = new DataView(headerData.buffer)
+    const sampleRate = view.getUint32(24, true)
+    const numChannels = view.getUint16(22, true)
+    
+    console.log('音频参数:', { sampleRate, numChannels })
+    
+    // 创建AudioContext
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)()
+    await audioContext.resume()
+    
+    // 使用Uint8Array来累积字节数据
+    let byteBuffer = new Uint8Array(0)
+    let isPlaying = false
+    
+    const playPCMData = () => {
+      // 确保至少有2字节（一个16-bit样本）
+      if (byteBuffer.length < 2 || isPlaying) return
+      
+      // 只处理2的倍数长度的数据
+      const validLength = Math.floor(byteBuffer.length / 2) * 2
+      const pcmData = new Int16Array(byteBuffer.slice(0, validLength).buffer)
+      
+      // 剩余未处理的字节
+      const remaining = byteBuffer.slice(validLength)
+      byteBuffer = remaining
+      
+      console.log(`处理音频块: ${validLength} bytes, ${pcmData.length} samples, 剩余: ${remaining.length} bytes`)
+      
+      const numFrames = pcmData.length
+      const audioBuffer = audioContext.createBuffer(numChannels, numFrames, sampleRate)
+      
+      // 填充数据
+      for (let channel = 0; channel < numChannels; channel++) {
+        const channelData = audioBuffer.getChannelData(channel)
+        for (let i = 0; i < numFrames; i++) {
+          if (numChannels === 2) {
+            channelData[i] = pcmData[i * 2 + channel] / 32768.0
+          } else {
+            channelData[i] = pcmData[i] / 32768.0
+          }
+        }
+      }
+      
+      isPlaying = true
+      const source = audioContext.createBufferSource()
+      source.buffer = audioBuffer
+      source.connect(audioContext.destination)
+      
+      source.onended = () => {
+        console.log('音频块播放完成')
+        isPlaying = false
+        // 播放下一块
+        if (byteBuffer.length >= 2) {
+          playPCMData()
+        }
+      }
+      
+      source.start()
+      console.log('开始播放音频块')
+    }
+    
+    // 读取后续音频数据
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) {
+        console.log('所有音频数据接收完成')
+        // 播放最后剩余的完整样本
+        if (byteBuffer.length >= 2 && !isPlaying) {
+          playPCMData()
+        }
+        break
+      }
+      
+      console.log(`收到音频块: ${value.byteLength} bytes`)
+      
+      // 累积字节数据
+      const combined = new Uint8Array(byteBuffer.length + value.byteLength)
+      combined.set(byteBuffer)
+      combined.set(new Uint8Array(value), byteBuffer.length)
+      byteBuffer = combined
+      
+      // 如果有足够数据且没有在播放，开始播放
+      if (byteBuffer.length >= 8192 && !isPlaying) {
+        playPCMData()
+      }
+    }
+    
+  } catch (error) {
+    console.error('流式TTS失败:', error)
+  
+  }
+}
 
 const stopAudio = () => {
 
