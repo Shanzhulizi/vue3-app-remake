@@ -55,7 +55,7 @@
             accept=".wav,.mp3,.m4a"
             required
           >
-          <small>支持 WAV、MP3 格式，建议 3-15 秒</small>
+          <small>支持 WAV、MP3 格式，建议 10-15 秒</small>
         </div>
 
         <div v-if="audioPreview" class="audio-preview">

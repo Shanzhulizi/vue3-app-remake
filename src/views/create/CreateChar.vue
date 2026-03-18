@@ -343,17 +343,19 @@ const submit = async () => {
     let res
     if (isEdit.value) {
       res = await updateCharacter(characterId.value, formData)
+      console.log('更新角色响应:', res)
       alert('更新成功')
     } else {
       res = await createCharacter(formData)
+      console.log('创建角色响应:', res)
       alert('创建成功')
     }
 
     // 跳转到角色详情页或列表页
     if (isEdit.value) {
-      router.push(`/characters/${characterId.value}`)
+      router.push(`/chat/${characterId.value}`)
     } else {
-      router.push(`/characters/${res.data.id}`)
+      router.push(`/chat/${res.data.data.id}`)
     }
 
   } catch (err) {

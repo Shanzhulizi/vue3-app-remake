@@ -9,27 +9,82 @@
       </div>
 
       <div v-else class="recommend-container">
-        <!-- 使用组件，通过 type 区分 -->
+        <!-- 1. 热门推荐 -->
         <RecommendRow
-          type="comprehensive"
-          :items="recommendations.comprehensive"
-          @click-more="goToMore('comprehensive')"
+          type="hot"
+          :items="recommendations.hot"
+          title="🔥 热门推荐"
+          desc="总热度最高的角色"
+          @click-more="goToMore('hot')"
           @click-item="goChat"
           @toggle-like="toggleLike"
         />
         
+        <!-- 2. 近期流行 -->
+        <RecommendRow
+          type="popular"
+          :items="recommendations.popular"
+          title="📈 近期流行"
+          desc="最近7天最受欢迎"
+          @click-more="goToMore('popular')"
+          @click-item="goChat"
+          @toggle-like="toggleLike"
+        />
+        
+        <!-- 3. 近期飙升 -->
         <RecommendRow
           type="trending"
           :items="recommendations.trending"
+          title="⚡ 近期飙升"
+          desc="最近24小时飙升最快"
           @click-more="goToMore('trending')"
           @click-item="goChat"
           @toggle-like="toggleLike"
         />
         
+        <!-- 4. 个性化推荐 -->
         <RecommendRow
-          type="mixed"
-          :items="recommendations.mixed"
-          @click-more="goToMore('mixed')"
+         
+          type="personalized"
+          :items="recommendations.personalized"
+          title="🎯 猜你喜欢"
+          desc="根据你的偏好推荐"
+          @click-more="goToMore('personalized')"
+          @click-item="goChat"
+          @toggle-like="toggleLike"
+        />
+        
+        <!-- 5. 向量推荐 -->
+        <RecommendRow
+         
+          type="vector"
+          :items="recommendations.vector"
+          title="🧠 智能推荐"
+          desc="基于向量相似度"
+          @click-more="goToMore('vector')"
+          @click-item="goChat"
+          @toggle-like="toggleLike"
+        />
+        
+        <!-- 6. 协同过滤 -->
+        <RecommendRow
+          
+          type="similar"
+          :items="recommendations.similar"
+          title="👥 相似用户喜欢"
+          desc="和你品味相投的人也在聊"
+          @click-more="goToMore('similar')"
+          @click-item="goChat"
+          @toggle-like="toggleLike"
+        />
+        
+        <!-- 7. 混合推荐 -->
+        <RecommendRow
+          type="mix"
+          :items="recommendations.mix"
+          title="🎲 混合推荐"
+          desc="多种算法综合推荐"
+          @click-more="goToMore('mix')"
           @click-item="goChat"
           @toggle-like="toggleLike"
         />
@@ -48,19 +103,32 @@ import RecommendRow from '@/components/RecommendRow.vue'
 const router = useRouter()
 const loading = ref(true)
 const recommendations = ref({
-  comprehensive: [],
+  hot: [],
+  popular: [],
   trending: [],
-  mixed: []
+  personalized: [],
+  vector: [],
+  similar: [],
+  mix: []
 })
 
 const fetchRecommendations = async () => {
   try {
     loading.value = true
     const res = await getAllRecommends({
-      comprehensive_limit: 10,
+      hot_limit: 10,
+      popular_limit: 10,
       trending_limit: 10,
-      mixed_limit: 10,
-      trending_days: 7
+      personalized_limit: 10,
+      vector_limit: 10,
+      similar_limit: 10,
+      mix_limit: 10,
+      popular_hours: 168,
+      trending_hours: 24,
+      personalized_days: 30,
+      vector_days: 30,
+      vector_threshold: 0.1,
+      similar_days: 30
     })
     
     if (res.data.code === 200) {
@@ -77,9 +145,13 @@ const fetchRecommendations = async () => {
 const fetchAllLikeStatus = async () => {
   try {
     const allIds = [
-      ...recommendations.value.comprehensive.map(c => c.id),
+      ...recommendations.value.hot.map(c => c.id),
+      ...recommendations.value.popular.map(c => c.id),
       ...recommendations.value.trending.map(c => c.id),
-      ...recommendations.value.mixed.map(c => c.id)
+      ...recommendations.value.personalized.map(c => c.id),
+      ...recommendations.value.vector.map(c => c.id),
+      ...recommendations.value.similar.map(c => c.id),
+      ...recommendations.value.mix.map(c => c.id)
     ]
     
     if (allIds.length === 0) return
@@ -87,15 +159,10 @@ const fetchAllLikeStatus = async () => {
     const res = await batchGetLikeStatus(allIds)
     const likedMap = res.data.data?.liked_map || {}
     
-    // 更新每一行的点赞状态
-    recommendations.value.comprehensive.forEach(char => {
-      char.is_liked = likedMap[char.id] || false
-    })
-    recommendations.value.trending.forEach(char => {
-      char.is_liked = likedMap[char.id] || false
-    })
-    recommendations.value.mixed.forEach(char => {
-      char.is_liked = likedMap[char.id] || false
+    Object.keys(recommendations.value).forEach(key => {
+      recommendations.value[key].forEach(char => {
+        char.is_liked = likedMap[char.id] || false
+      })
     })
   } catch (err) {
     console.error('获取点赞状态失败:', err)

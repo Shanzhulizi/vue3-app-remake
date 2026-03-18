@@ -94,7 +94,7 @@ const avatarChar = computed(() =>
 onMounted(async () => {
 
   const res1 = await getCharacterDetail(characterId)
-  character.value = res1.data
+  character.value = res1.data.data
 
   const res2 = await getHistoryConversation(characterId)
   messages.value = res2.data.messages || []
@@ -210,7 +210,7 @@ const playTTSStream = async (text) => {
   console.log('🎤 请求流式TTS接口，文本:', text)
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/api/voice/cosyvoice_tts_stream", {
+    const response = await fetch("http://127.0.0.1:8000/api/voice/cosyvoice_tts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text, voice_id }),
