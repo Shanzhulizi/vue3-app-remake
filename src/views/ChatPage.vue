@@ -16,21 +16,19 @@
     <!-- 聊天消息 -->
     <main class="chat-messages" ref="messageBox">
 
-      <div v-for="(msg, i) in messages" :key="msg.id || i" class="message" :class="msg.sender_type">
-
+      <div v-for="(msg, i) in messages" :key="msg.id || i" 
+           class="message" 
+           :class="[msg.sender_type, { 'error-message': msg.isError }]">
         <div class="bubble">
-
           {{ msg.content }}
-
-          <!-- AI消息语音播放 -->
-          <button v-if="msg.sender_type === 'assistant'" class="tts-btn" @click="playTTS(msg.content)">
+          
+          <!-- AI消息语音播放 - 只在正常消息且没有错误时显示 -->
+          <button v-if="msg.sender_type === 'assistant' && !msg.isError && !msg.content.includes('失败') && !msg.content.includes('错误')" 
+                  class="tts-btn" @click="playTTS(msg.content)">
             🔈
           </button>
-
         </div>
-
       </div>
-
 
       <div v-if="loading" class="message assistant">
         <div class="bubble typing">思考中...</div>
@@ -41,29 +39,17 @@
 
     <!-- 输入区 -->
     <footer class="chat-input">
-
       <input v-model="input" placeholder="输入消息..." :disabled="loading" @keydown.enter="sendText" />
-
-      <button @click="sendText" :disabled="loading || !input.trim()">
-        发送
-      </button>
-
-      <!-- 语音通话 -->
-      <button class="call-btn" @click="startVoiceCall">
-        📞
-
-      </button>
-
+      <button @click="sendText" :disabled="loading || !input.trim()">发送</button>
+      <button class="call-btn" @click="startVoiceCall">📞</button>
     </footer>
 
   </div>
 </template>
 
 <script setup>
-
-import { ref, onMounted, computed, nextTick, reactive } from 'vue'
+import { ref, onMounted, computed, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-
 import { chat } from '@/api/chat'
 import { tts } from '@/api/voice'
 import { fetchStream } from '@/api/stream'
@@ -92,16 +78,16 @@ const avatarChar = computed(() =>
 
 
 onMounted(async () => {
-
   const res1 = await getCharacterDetail(characterId)
   character.value = res1.data.data
 
   const res2 = await getHistoryConversation(characterId)
-  messages.value = res2.data.messages || []
+  messages.value = res2.data.data || []
 
   scrollBottom()
-
 })
+
+
 
 
 /* 发送文字 */
@@ -147,214 +133,139 @@ const sendText = async () => {
   const userText = input.value
   input.value = ''
 
+  // 添加用户消息
   messages.value.push({
     sender_type: 'user',
     content: userText
   })
 
+  // 准备助手消息占位
   const msgIndex = messages.value.length
   messages.value.push({
     sender_type: 'assistant',
-    content: ''
+    content: '',
+    isError: false  // 添加错误标记
   })
 
   loading.value = true
   await scrollBottom()
 
-  console.log('🚀 开始请求流式接口')  // <-- 加这里
+  console.log('🚀 开始请求流式接口')
+  
+  let hasError = false
+  let errorMessage = ''
 
-  await fetchStream("/chat/stream",
-    {
-      character_id: characterId,
-      message: userText
-    },
-    (chunk) => {
-      // 🔥 关键：这个回调到底执不执行？
-      console.log('🔥【前端收到chunk】:', chunk, '长度:', chunk.length)
+  try {
+    await fetchStream("/chat/stream",
+      {
+        character_id: characterId,
+        message: userText
+      },
+      (chunk) => {
+        console.log('🔥【前端收到chunk】:', chunk, '长度:', chunk.length)
 
-      messages.value[msgIndex].content += chunk
-      messages.value = [...messages.value]
-      scrollBottom()
+        // 检查是否是错误信息
+        if (chunk.includes('[流式回复系统错误:') || 
+            chunk.includes('【系统错误】') ||
+            chunk.includes('[系统错误:')) {
+          hasError = true
+          errorMessage = chunk
+          console.warn('⚠️ 检测到错误信息:', chunk)
+        }
+
+        // 如果没有错误，正常更新内容
+        if (!hasError) {
+          messages.value[msgIndex].content += chunk
+          messages.value = [...messages.value]
+          scrollBottom()
+        }
+      }
+    )
+  } catch (error) {
+    console.error('流式请求异常:', error)
+    hasError = true
+    errorMessage = error.message
+  }
+
+  console.log('🏁 流式请求完成', { hasError })
+
+  // 处理错误情况 - 将占位消息更新为错误提示
+  if (hasError) {
+    console.log('❌ 发生错误，更新消息为错误提示')
+    
+    // 根据错误内容设置友好的错误提示
+    let friendlyError = '生成失败，请稍后再试'
+    
+    if (errorMessage.includes('10061') || errorMessage.includes('积极拒绝')) {
+      friendlyError = '😴 AI服务未启动，请稍后再试'
+    } else if (errorMessage.includes('timeout')) {
+      friendlyError = '⏰ 响应超时，请重试'
+    } else if (errorMessage.includes('network') || errorMessage.includes('网络')) {
+      friendlyError = '📡 网络连接失败，请检查网络'
     }
-  )
+    
+    // 更新占位的助手消息为错误提示
+    messages.value[msgIndex].content = friendlyError
+    messages.value[msgIndex].isError = true
+    messages.value = [...messages.value]
+  }
 
-  console.log('🏁 流式请求完成')  // <-- 加这里
   loading.value = false
+  await scrollBottom()
 }
 
 
-
 /* 播放TTS */
-
 const playTTS = async (text) => {
-
   stopAudio()
   const voice_id = character.value.voice_id
-  console.log(character.value)
   console.log('🎤 请求TTS接口，文本:', text, '角色ID:', characterId, '声音ID:', voice_id)
   const res = await tts({
     text,
-    // character_id: characterId,
     voice_id: voice_id
   })
   console.log('audio_url:', res.data.data.audio_url)
   audioPlayer = new Audio(res.data.data.audio_url)
-
   audioPlayer.play()
-
 }
-const playTTSStream = async (text) => {
-  stopAudio()
 
-  const voice_id = character.value.voice_id
-  console.log('🎤 请求流式TTS接口，文本:', text)
-
-  try {
-    const response = await fetch("http://127.0.0.1:8000/api/voice/cosyvoice_tts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, voice_id }),
-    })
-
-    if (!response.ok) throw new Error('TTS请求失败')
-
-    const reader = response.body.getReader()
-    
-    // 先读取WAV header
-    const headerResult = await reader.read()
-    const headerData = headerResult.value
-    console.log('WAV header:', headerData.byteLength, 'bytes')
-    
-    // 解析WAV header
-    const view = new DataView(headerData.buffer)
-    const sampleRate = view.getUint32(24, true)
-    const numChannels = view.getUint16(22, true)
-    
-    console.log('音频参数:', { sampleRate, numChannels })
-    
-    // 创建AudioContext
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)()
-    await audioContext.resume()
-    
-    // 使用Uint8Array来累积字节数据
-    let byteBuffer = new Uint8Array(0)
-    let isPlaying = false
-    
-    const playPCMData = () => {
-      // 确保至少有2字节（一个16-bit样本）
-      if (byteBuffer.length < 2 || isPlaying) return
-      
-      // 只处理2的倍数长度的数据
-      const validLength = Math.floor(byteBuffer.length / 2) * 2
-      const pcmData = new Int16Array(byteBuffer.slice(0, validLength).buffer)
-      
-      // 剩余未处理的字节
-      const remaining = byteBuffer.slice(validLength)
-      byteBuffer = remaining
-      
-      console.log(`处理音频块: ${validLength} bytes, ${pcmData.length} samples, 剩余: ${remaining.length} bytes`)
-      
-      const numFrames = pcmData.length
-      const audioBuffer = audioContext.createBuffer(numChannels, numFrames, sampleRate)
-      
-      // 填充数据
-      for (let channel = 0; channel < numChannels; channel++) {
-        const channelData = audioBuffer.getChannelData(channel)
-        for (let i = 0; i < numFrames; i++) {
-          if (numChannels === 2) {
-            channelData[i] = pcmData[i * 2 + channel] / 32768.0
-          } else {
-            channelData[i] = pcmData[i] / 32768.0
-          }
-        }
-      }
-      
-      isPlaying = true
-      const source = audioContext.createBufferSource()
-      source.buffer = audioBuffer
-      source.connect(audioContext.destination)
-      
-      source.onended = () => {
-        console.log('音频块播放完成')
-        isPlaying = false
-        // 播放下一块
-        if (byteBuffer.length >= 2) {
-          playPCMData()
-        }
-      }
-      
-      source.start()
-      console.log('开始播放音频块')
-    }
-    
-    // 读取后续音频数据
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) {
-        console.log('所有音频数据接收完成')
-        // 播放最后剩余的完整样本
-        if (byteBuffer.length >= 2 && !isPlaying) {
-          playPCMData()
-        }
-        break
-      }
-      
-      console.log(`收到音频块: ${value.byteLength} bytes`)
-      
-      // 累积字节数据
-      const combined = new Uint8Array(byteBuffer.length + value.byteLength)
-      combined.set(byteBuffer)
-      combined.set(new Uint8Array(value), byteBuffer.length)
-      byteBuffer = combined
-      
-      // 如果有足够数据且没有在播放，开始播放
-      if (byteBuffer.length >= 8192 && !isPlaying) {
-        playPCMData()
-      }
-    }
-    
-  } catch (error) {
-    console.error('流式TTS失败:', error)
-  
-  }
-}
 
 const stopAudio = () => {
-
   if (audioPlayer) {
-
     audioPlayer.pause()
-
     audioPlayer = null
-
   }
-
 }
 
 
 /* 语音通话 */
-
 const startVoiceCall = () => {
-
   router.push(`/voice-call/${characterId}`)
-
 }
 
 
 /* 滚动 */
-
 const scrollBottom = async () => {
-
   await nextTick()
-
   if (messageBox.value) {
     messageBox.value.scrollTop = messageBox.value.scrollHeight
   }
-
 }
 
 </script>
 
 <style scoped>
 @import '@/assets/styles/pages/chatPage.css';
+
+/* 添加错误消息样式 */
+.error-message .bubble {
+  background-color: #fef0f0;
+  color: #f56c6c;
+  border-left: 3px solid #f56c6c;
+}
+
+/* 确保错误消息不显示喇叭按钮 */
+.error-message .tts-btn {
+  display: none;
+}
 </style>
