@@ -12,8 +12,7 @@ import CreateScene from "../views/create/CreateScene.vue";
 import CreateVoice from "../views/create/CreateVoice.vue";
 import ChatPage from "../views/ChatPage.vue";
 import VoiceChatPage from "../views/VoiceChatPage.vue";
-import CreateVoice2 from "../views/create/CreateVoice2.vue";
-import CreateVoice3 from "../views/create/CreateVoice3.vue";
+// import CreateVoice2 from "../views/create/CreateVoice2.vue";
 
 const routes = [
   {
@@ -27,9 +26,10 @@ const routes = [
       { path: "chat/:character_id", component: ChatPage, meta: { showTopbar: false } },
       {  path: 'chat/:character_id/voice',  component: VoiceChatPage, meta: { showTopbar: false } },
       { path: "create/scene", component: CreateScene , meta: { showTopbar: false }},
+      // { path: "create/voice", component: CreateVoice, meta: { showTopbar: false } },
+      // { path: "create/voice2", component: CreateVoice2, meta: { showTopbar: false } },
+      // { path: "create/voice3", component: CreateVoice3, meta: { showTopbar: false } },
       { path: "create/voice", component: CreateVoice, meta: { showTopbar: false } },
-      { path: "create/voice2", component: CreateVoice2, meta: { showTopbar: false } },
-      { path: "create/voice3", component: CreateVoice3, meta: { showTopbar: false } },
     ],
   },
   {

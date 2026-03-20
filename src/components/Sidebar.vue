@@ -8,10 +8,13 @@
 
         <div v-show="showCreate" class="create-menu">
           <div class="create-item" @click="create('role')">角色</div>
-          <div class="create-item" @click="create('scene')">场景</div>
-          <div class="create-item" @click="create('voice')">语音</div>
+          <!-- <div class="create-item" @click="create('scene')">场景</div> -->
+          <!-- <div class="create-item" @click="create('voice')">语音</div>
           <div class="create-item" @click="create('voice2')">语音2</div>
-          <div class="create-item" @click="create('voice3')">语音3</div>
+          <div class="create-item" @click="create('voice3')">语音3</div> -->
+
+
+          <div class="create-item" @click="create('voice')">语音</div>
 
         </div>
       </div>

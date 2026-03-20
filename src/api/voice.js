@@ -28,7 +28,7 @@ export const generateAudio2 = (data) =>
 
 
 export const tts = (data) =>
-  apiClient.post("/voice/cosyvoice_tts", data,{
+  apiClient.post("/voice/tts", data,{
     timeout: 300000,
   })
 
