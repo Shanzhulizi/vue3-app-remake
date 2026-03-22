@@ -1,23 +1,136 @@
+
+/* =========================
+   ChatGPT 风格顶栏 - 淡雅高级
+========================= */
+
 .topbar {
   height: 64px;
-  padding: 0 20px;
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 0 24px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 16px;
+  gap: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
+/* =========================
+   搜索框 - ChatGPT 风格
+========================= */
+.search-box {
+  position: relative;
+  flex: 0 1 auto;
+}
+
+.search-box input {
+  width: 280px;
+  height: 38px;
+  padding: 0 16px 0 40px;
+  border-radius: 24px;
+  border: 1px solid #e2e8f0;
+  background: #f7f8fa;
+  font-size: 14px;
+  color: #1e293b;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-box input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.search-box input:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.search-box input:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.02), 0 0 0 1px #cbd5e1;
+}
+
+/* 搜索图标 - 纯 CSS 装饰 */
+.search-box::before {
+  content: "🔍";
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  opacity: 0.6;
+  pointer-events: none;
+  filter: grayscale(0.2);
+}
+
+/* =========================
+   用户区域 - ChatGPT 风格
+========================= */
 .user-box {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
+  padding: 6px 12px 6px 8px;
+  border-radius: 32px;
+  transition: all 0.2s ease;
+  background: transparent;
 }
-.search-box input {
-  width: 260px;
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 999px;
+
+.user-box:hover {
+  background: #f1f5f9;
+}
+
+.user-box span {
+  font-size: 14px;
+  font-weight: 450;
+  color: #334155;
+  letter-spacing: -0.2px;
+}
+
+/* 未登录状态 */
+.user-box span:only-child {
+  padding: 0 8px;
+  font-weight: 500;
+  color: #3b82f6;
+}
+
+
+/* =========================
+   响应式适配
+========================= */
+@media (max-width: 768px) {
+  .topbar {
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  .search-box input {
+    width: 200px;
+  }
+
+  .user-box span {
+    display: none;
+  }
+
+  .user-box {
+    padding: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-box input {
+    width: 160px;
+    padding-left: 36px;
+  }
+
+  .search-box::before {
+    font-size: 12px;
+    left: 12px;
+  }
 }

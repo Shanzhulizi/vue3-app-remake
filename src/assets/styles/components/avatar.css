@@ -1,18 +1,28 @@
+
+/* =========================
+   头像 - 精致圆形
+========================= */
 .avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
+}
+
+.user-box:hover .avatar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 
 .avatar-text {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   color: #ffffff;
   line-height: 1;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
 }
+

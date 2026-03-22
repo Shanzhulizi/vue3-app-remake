@@ -188,7 +188,9 @@ const sendText = async () => {
         // ========== 检查错误信息 ==========
         if (chunk.includes('[流式回复系统错误:') || 
             chunk.includes('【系统错误】') ||
-            chunk.includes('[系统错误:')) {
+            chunk.includes('[系统错误:') ||
+            chunk.includes('[连接中断'))
+            {
           hasError = true
           errorMessage = chunk
           console.warn('⚠️ 检测到错误信息:', chunk)
@@ -263,7 +265,7 @@ const stopAudio = () => {
 
 /* 语音通话 */
 const startVoiceCall = () => {
-  router.push(`/voice-call/${characterId}`)
+  router.push(`/chat/${characterId}/voice`)
 }
 
 
@@ -280,15 +282,4 @@ const scrollBottom = async () => {
 <style scoped>
 @import '@/assets/styles/pages/chatPage.css';
 
-/* 添加错误消息样式 */
-.error-message .bubble {
-  background-color: #fef0f0;
-  color: #f56c6c;
-  border-left: 3px solid #f56c6c;
-}
-
-/* 确保错误消息不显示喇叭按钮 */
-.error-message .tts-btn {
-  display: none;
-}
 </style>

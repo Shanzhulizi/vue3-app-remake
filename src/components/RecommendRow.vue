@@ -232,129 +232,154 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* =========================
+   RecommendRow 组件 - ChatGPT 风格
+========================= */
+
 .recommend-section {
   width: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
 }
 
+/* 头部区域 - 极简克制 */
 .section-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
   margin-bottom: 20px;
-  border-bottom: 1px solid #eaeaea;
   padding-bottom: 12px;
+  border-bottom: 1px solid #eef2f6;
 }
 
 .header-left {
   display: flex;
   align-items: baseline;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .section-title {
   font-size: 18px;
   font-weight: 500;
-  color: #111;
+  color: #1e293b;
   margin: 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  letter-spacing: 0.5px;
+  letter-spacing: -0.2px;
 }
 
 .title-icon {
-  font-size: 14px;
-  font-weight: 600;
-  color: #555;
-  background: #f0f0f0;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  background: #f1f5f9;
   padding: 2px 8px;
-  border-radius: 12px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
 }
 
 .section-desc {
   font-size: 13px;
-  color: #777;
+  color: #64748b;
   font-weight: 400;
 }
 
+/* 更多按钮 - 柔和边框 */
 .more-btn {
-  padding: 4px 12px;
-  background: none;
-  border: 1px solid #ddd;
-  border-radius: 16px;
-  color: #555;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  color: #475569;
   cursor: pointer;
-  transition: all 0.2s;
-  font-size: 12px;
+  transition: all 0.2s ease;
+  font-size: 13px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  font-weight: 450;
 }
 
 .more-btn:hover {
-  background: #f5f5f5;
-  border-color: #999;
-  color: #333;
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #1e293b;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .arrow {
-  font-size: 14px;
-  line-height: 1;
+  font-size: 13px;
+  transition: transform 0.2s ease;
 }
 
+.more-btn:hover .arrow {
+  transform: translateX(2px);
+}
 
+/* =========================
+   滚动容器 - 优雅横向滚动
+========================= */
 .scroll-container {
   position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
   width: 100%;
-  /* 确保占满宽度 */
 }
 
 .horizontal-scroll {
   flex: 1;
   display: flex;
-  gap: 16px;
+  gap: 20px;
   overflow-x: auto;
   scroll-behavior: smooth;
-  padding: 4px 0 16px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  width: 100%;
-  /* 确保占满宽度 */
+  padding: 4px 0 20px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
 }
-
 
 .horizontal-scroll::-webkit-scrollbar {
-  display: none;
+  height: 4px;
 }
 
+.horizontal-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* 滚动箭头 - 优雅圆形 */
 .scroll-arrow {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: white;
-  border: 1px solid #ddd;
-  color: #555;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #475569;
   font-size: 18px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   flex-shrink: 0;
-  /* 防止被压缩 */
   z-index: 10;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
-
 .scroll-arrow:hover:not(:disabled) {
-  background: #f5f5f5;
-  border-color: #999;
-  color: #333;
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1e293b;
 }
 
 .scroll-arrow.hidden {
@@ -364,43 +389,48 @@ onUnmounted(() => {
 }
 
 .scroll-arrow:disabled {
-  opacity: 0.2;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
+/* =========================
+   卡片 - ChatGPT 精致风格
+========================= */
 .scroll-item {
   flex: 0 0 v-bind(cardWidth + 'px');
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.25s ease, opacity 0.2s ease;
 }
 
 .scroll-item:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
 }
 
 .recommend-card {
-  background: white;
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #eef2f6;
+  border-radius: 16px;
   overflow: hidden;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
   height: 100%;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .recommend-card:hover {
-  border-color: #ccc;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  border-color: #e2e8f0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
 }
 
+/* 头像区域 */
 .card-avatar {
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
   overflow: hidden;
-  background: #fafafa;
-  border-bottom: 1px solid #f0f0f0;
+  background: #f8fafc;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .card-avatar img {
@@ -410,7 +440,11 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: grayscale(20%);
+  transition: transform 0.3s ease;
+}
+
+.scroll-item:hover .card-avatar img {
+  transform: scale(1.02);
 }
 
 .avatar-placeholder {
@@ -422,147 +456,185 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f5f5f5;
-  color: #999;
-  font-size: 42px;
-  font-weight: 300;
+  background: #f1f5f9;
+  color: #94a3b8;
+  font-size: 48px;
+  font-weight: 400;
 }
 
+/* 徽章 - 高级灰 */
 .badge {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  padding: 4px 8px;
-  border-radius: 12px;
+  top: 12px;
+  left: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
   font-size: 10px;
   font-weight: 500;
-  color: white;
+  color: #ffffff;
   z-index: 2;
   letter-spacing: 0.3px;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.6);
 }
 
-.badge-hot {
-  background: #333;
-}
-
-.badge-trend {
-  background: #555;
-}
-
-.badge-pick {
-  background: #777;
-}
+.badge-hot { background: rgba(0, 0, 0, 0.65); }
+.badge-popular { background: rgba(0, 0, 0, 0.6); }
+.badge-trend { background: rgba(0, 0, 0, 0.6); }
+.badge-personalized { background: rgba(0, 0, 0, 0.6); }
+.badge-vector { background: rgba(0, 0, 0, 0.6); }
+.badge-similar { background: rgba(0, 0, 0, 0.6); }
+.badge-mix { background: rgba(0, 0, 0, 0.6); }
 
 .badge-text {
-  font-size: 9px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 500;
 }
 
+/* 点赞按钮 - 极简灰 */
 .like-button {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
+  bottom: 12px;
+  right: 12px;
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 8px;
+  padding: 4px 10px;
   background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(2px);
-  border: 1px solid #eee;
-  border-radius: 16px;
-  color: #333;
+  backdrop-filter: blur(4px);
+  border: 1px solid #eef2f6;
+  border-radius: 24px;
+  color: #475569;
   font-size: 11px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   z-index: 10;
 }
 
 .like-button:hover {
-  background: white;
-  border-color: #ccc;
+  background: #ffffff;
+  border-color: #cbd5e1;
 }
 
 .like-button.liked {
-  background: #f5f5f5;
-  border-color: #aaa;
-  color: #000;
+  background: #f8fafc;
+  border-color: #cbd5e1;
 }
 
 .heart {
-  font-size: 12px;
-  color: #888;
+  font-size: 13px;
+  color: #94a3b8;
+  transition: color 0.2s ease;
 }
 
 .like-button.liked .heart {
-  color: #333;
+  color: #e5484d;
 }
 
 .count {
-  font-weight: 400;
-  min-width: 14px;
+  font-weight: 450;
+  min-width: 18px;
   text-align: center;
-  color: #666;
+  color: #475569;
 }
 
+/* 卡片信息 */
 .card-info {
-  padding: 12px;
+  padding: 14px;
   flex: 1;
   display: flex;
   flex-direction: column;
+  background: #ffffff;
 }
 
 .card-name {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   margin: 0 0 4px;
-  color: #222;
+  color: #1e293b;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.2px;
 }
 
 .card-desc {
-  font-size: 11px;
-  color: #888;
-  margin: 0 0 10px;
+  font-size: 12px;
+  color: #64748b;
+  margin: 0 0 12px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  line-height: 1.4;
-  min-height: 30px;
+  line-height: 1.45;
+  min-height: 36px;
   flex: 1;
 }
 
+/* 统计信息 - 极简分割 */
 .card-stats {
   display: flex;
-  gap: 12px;
-  color: #777;
-  font-size: 10px;
-  border-top: 1px solid #f0f0f0;
-  padding-top: 8px;
+  gap: 16px;
+  color: #64748b;
+  font-size: 11px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 10px;
   margin-top: auto;
 }
 
 .card-stats span {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
+  font-weight: 450;
 }
 
+/* =========================
+   移动端适配
+========================= */
 @media (max-width: 768px) {
   .scroll-arrow {
     width: 28px;
     height: 28px;
     font-size: 16px;
   }
-
-  .card-name {
-    font-size: 13px;
+  
+  .section-header {
+    flex-wrap: wrap;
+    gap: 12px;
   }
-
+  
+  .more-btn {
+    padding: 4px 12px;
+    font-size: 12px;
+  }
+  
+  .card-name {
+    font-size: 14px;
+  }
+  
   .card-stats {
-    gap: 8px;
+    gap: 12px;
+    font-size: 10px;
+  }
+  
+  .like-button {
+    padding: 3px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-title {
+    font-size: 16px;
+  }
+  
+  .title-icon {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+  
+  .section-desc {
+    font-size: 11px;
   }
 }
 </style>

@@ -66,6 +66,11 @@ router.push(`/create/${type}`)
 
 
 </script>
+
+
+
+
 <style scoped>
 @import '@/assets/styles/layout/sidebar.css';
 </style>
+
