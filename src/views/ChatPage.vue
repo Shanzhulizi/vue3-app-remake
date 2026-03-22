@@ -70,7 +70,7 @@ const input = ref('')
 const messageBox = ref(null)
 
 let audioPlayer = null
-
+let pendingReplace = false  // 标记是否需要替换
 
 const avatarChar = computed(() =>
   character.value.name ? character.value.name[0] : '?'
@@ -86,6 +86,7 @@ onMounted(async () => {
 
   scrollBottom()
 })
+
 
 
 
@@ -126,6 +127,7 @@ onMounted(async () => {
 // }
 
 
+
 /* 流式 */
 const sendText = async () => {
   if (!input.value.trim()) return
@@ -144,7 +146,7 @@ const sendText = async () => {
   messages.value.push({
     sender_type: 'assistant',
     content: '',
-    isError: false  // 添加错误标记
+    isError: false
   })
 
   loading.value = true
@@ -154,6 +156,8 @@ const sendText = async () => {
   
   let hasError = false
   let errorMessage = ''
+  let receivedNormalContent = false
+  let fullResponse = ''  // 记录完整回复用于检测
 
   try {
     await fetchStream("/chat/stream",
@@ -162,9 +166,26 @@ const sendText = async () => {
         message: userText
       },
       (chunk) => {
-        console.log('🔥【前端收到chunk】:', chunk, '长度:', chunk.length)
-
-        // 检查是否是错误信息
+        console.log('🔥【前端收到chunk】:', chunk)
+        
+        // ========== 检查是否是替换标记 ==========
+        // 格式: [REPLACE]新内容
+        if (chunk.includes('[REPLACE]')) {
+          const parts = chunk.split('[REPLACE]')
+          const newContent = parts[1] || '抱歉，我无法回答这个问题。'
+          
+          console.log('🔄 检测到替换标记，替换内容为:', newContent)
+          
+          // 替换整个助手消息
+          messages.value[msgIndex].content = newContent
+          messages.value[msgIndex].isError = true
+          messages.value = [...messages.value]
+          
+          // 标记已经处理，不再继续追加
+          return
+        }
+        
+        // ========== 检查错误信息 ==========
         if (chunk.includes('[流式回复系统错误:') || 
             chunk.includes('【系统错误】') ||
             chunk.includes('[系统错误:')) {
@@ -172,12 +193,16 @@ const sendText = async () => {
           errorMessage = chunk
           console.warn('⚠️ 检测到错误信息:', chunk)
         }
-
-        // 如果没有错误，正常更新内容
-        if (!hasError) {
-          messages.value[msgIndex].content += chunk
-          messages.value = [...messages.value]
-          scrollBottom()
+        
+        // 正常内容，累加
+        fullResponse += chunk
+        messages.value[msgIndex].content = fullResponse
+        messages.value = [...messages.value]
+        scrollBottom()
+        
+        // 标记收到了正常内容
+        if (chunk.trim() && !chunk.includes('[REPLACE]')) {
+          receivedNormalContent = true
         }
       }
     )
@@ -187,13 +212,12 @@ const sendText = async () => {
     errorMessage = error.message
   }
 
-  console.log('🏁 流式请求完成', { hasError })
+  console.log('🏁 流式请求完成', { hasError, receivedNormalContent, fullResponse })
 
-  // 处理错误情况 - 将占位消息更新为错误提示
-  if (hasError) {
+  // 处理错误情况
+  if (hasError || !receivedNormalContent) {
     console.log('❌ 发生错误，更新消息为错误提示')
     
-    // 根据错误内容设置友好的错误提示
     let friendlyError = '生成失败，请稍后再试'
     
     if (errorMessage.includes('10061') || errorMessage.includes('积极拒绝')) {
@@ -204,7 +228,6 @@ const sendText = async () => {
       friendlyError = '📡 网络连接失败，请检查网络'
     }
     
-    // 更新占位的助手消息为错误提示
     messages.value[msgIndex].content = friendlyError
     messages.value[msgIndex].isError = true
     messages.value = [...messages.value]
