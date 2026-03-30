@@ -21,7 +21,7 @@
       <nav class="nav">
         <div class="nav-item" @click="go('/')">发现</div>
         <div class="nav-item" @click="go('/feed')">动态</div>
-        <div class="nav-item" @click="go('/avatarfx')">AvatarFX</div>
+        <!--<div class="nav-item" @click="go('/avatarfx')">AvatarFX</div>-->
       </nav>
     </div>
 

@@ -152,11 +152,35 @@ const getFullUrl = (url) => {
 }
 
 // 处理文件选择
+// 在 handleFileSelect 中添加时长检测
 const handleFileSelect = (event) => {
   const file = event.target.files[0]
-  if (file) {
-    audioPreview.value = URL.createObjectURL(file)
-  }
+  if (!file) return
+  
+  // 创建临时音频元素来获取时长
+  const audio = new Audio()
+  const url = URL.createObjectURL(file)
+  
+  audio.addEventListener('loadedmetadata', () => {
+    const duration = audio.duration
+    console.log('音频时长:', duration, '秒')
+    
+    if (duration < 3) {
+      alert('⚠️ 音频时长不足3秒，无法克隆')
+    } else if (duration > 10) {
+      alert('⚠️ 音频时长超过10秒，无法克隆')
+      // 可以选择截断或只是警告
+    } else {
+      console.log('音频时长合适')
+    }
+    
+    URL.revokeObjectURL(url)
+  })
+  
+  audio.src = url
+  
+  // 预览
+  audioPreview.value = url
 }
 
 // 移除音频
