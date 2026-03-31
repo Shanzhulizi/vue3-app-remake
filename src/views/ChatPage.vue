@@ -12,19 +12,29 @@
       </div>
     </header>
 
-
     <!-- 聊天消息 -->
-    <main class="chat-messages" ref="messageBox">
+    <main class="chat-messages" ref="messageBox" @scroll="handleScroll">
+      <!-- 加载更多提示 -->
+      <div v-if="loadingMore" class="loading-more">
+        <span class="loading-spinner"></span>
+        加载历史消息中...
+      </div>
 
-      <div v-for="(msg, i) in messages" :key="msg.id || i" 
-           class="message" 
-           :class="[msg.sender_type, { 'error-message': msg.isError }]">
+      <!-- 没有更多历史消息提示 -->
+      <div v-else-if="!hasMore && messages.length > 0" class="no-more">
+        — 已经没有更多历史消息 —
+      </div>
+
+      <!-- 消息列表 -->
+      <div v-for="(msg, i) in messages" :key="msg.id || i" :data-id="msg.id" class="message"
+        :class="[msg.sender_type, { 'error-message': msg.isError }]">
         <div class="bubble">
           {{ msg.content }}
-          
-          <!-- AI消息语音播放 - 只在正常消息且没有错误时显示 -->
-          <button v-if="msg.sender_type === 'assistant' && !msg.isError && !msg.content.includes('失败') && !msg.content.includes('错误')" 
-                  class="tts-btn" @click="playTTS(msg.content)">
+
+          <!-- AI消息语音播放 -->
+          <button
+            v-if="msg.sender_type === 'assistant' && !msg.isError && !msg.content.includes('失败') && !msg.content.includes('错误')"
+            class="tts-btn" @click="playTTS(msg.content)">
             🔈
           </button>
         </div>
@@ -35,7 +45,6 @@
       </div>
 
     </main>
-
 
     <!-- 输入区 -->
     <footer class="chat-input">
@@ -48,7 +57,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, nextTick } from 'vue'
+
+import { ref, onMounted, computed, nextTick, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { chat } from '@/api/chat'
 import { tts } from '@/api/voice'
@@ -65,70 +75,112 @@ const character = ref({})
 const messages = ref([])
 
 const loading = ref(false)
+const loadingMore = ref(false)
 const input = ref('')
+const hasMore = ref(true)
+const currentPage = ref(1)
+const pageSize = ref(20)
 
 const messageBox = ref(null)
-
 let audioPlayer = null
-let pendingReplace = false  // 标记是否需要替换
+let lastScrollHeight = 0  // 用于保持滚动位置
 
 const avatarChar = computed(() =>
   character.value.name ? character.value.name[0] : '?'
 )
 
-
+// 获取角色信息和历史消息
+// 组件挂载时
 onMounted(async () => {
   const res1 = await getCharacterDetail(characterId)
   character.value = res1.data.data
 
-  const res2 = await getHistoryConversation(characterId)
-  messages.value = res2.data.data || []
+  // 加载第一页历史消息
+  await loadHistoryMessages(false)
 
+  // ✅ 等待 DOM 更新完成后，滚动到底部
+  await nextTick()
   scrollBottom()
+
+  // ✅ 延迟一小段时间后，允许滚动加载
+  setTimeout(() => {
+    isInitialLoad.value = false
+  }, 500)
 })
 
+const isInitialLoad = ref(true)  // 标记是否首次加载
+const isLoadingMore = ref(false)  // 重命名，避免与 loadingMore 混淆
+let snapshotScrollHeight = 0
+let snapshotScrollTop = 0
 
+const loadHistoryMessages = async (isLoadMore = false) => {
+  if (isLoadingMore.value) return
+  if (!hasMore.value && isLoadMore) return
 
+  if (isLoadMore) {
+    isLoadingMore.value = true
+    
+    // ✅ 保存滚动快照
+    if (messageBox.value) {
+      snapshotScrollHeight = messageBox.value.scrollHeight
+      snapshotScrollTop = messageBox.value.scrollTop
+    }
+  }
 
+  try {
+    const res = await getHistoryConversation(characterId, currentPage.value, pageSize.value)
 
-/* 发送文字 */
+    if (res.data.code === 200) {
+      const newMessages = res.data.data || []
+      const pagination = res.data.pagination
 
-// const sendText = async () => {
+      if (isLoadMore && newMessages.length > 0) {
+        // 插入新消息到顶部
+        messages.value = [...newMessages, ...messages.value]
 
-//   if (!input.value.trim()) return
+        await nextTick()
 
-//   const userText = input.value
+        // ✅ 恢复滚动位置：新滚动位置 = 原滚动位置 + (新总高度 - 原总高度)
+        if (messageBox.value && snapshotScrollHeight > 0) {
+          const newScrollHeight = messageBox.value.scrollHeight
+          const heightIncrease = newScrollHeight - snapshotScrollHeight
+          messageBox.value.scrollTop = snapshotScrollTop + heightIncrease*2
+          console.log(`恢复滚动位置: 原高度=${snapshotScrollHeight}, 新高度=${newScrollHeight}, 增加=${heightIncrease}, 新位置=${snapshotScrollTop + heightIncrease}`)
+          
+          // 清空快照
+          snapshotScrollHeight = 0
+          snapshotScrollTop = 0
+        }
+      } else {
+        messages.value = newMessages
+      }
 
-//   input.value = ''
+      currentPage.value = pagination.page + 1
+      hasMore.value = currentPage.value <= pagination.pages
+    }
+  } catch (error) {
+    console.error('加载历史消息失败:', error)
+  } finally {
+    if (isLoadMore) {
+      isLoadingMore.value = false
+    }
+  }
+}
 
-//   messages.value.push({
-//     sender_type: 'user',
-//     content: userText
-//   })
+// 滚动事件处理
+const handleScroll = async (event) => {
+  // ✅ 首次加载时不触发滚动加载
+  if (isInitialLoad.value) return
 
-//   loading.value = true
+  const scrollTop = event.target.scrollTop
+  // 当滚动到顶部附近时加载更多
+  if (scrollTop < 50 && hasMore.value && !isLoadingMore.value && messages.value.length > 0) {
+    console.log('触发加载更多历史消息')
+    await loadHistoryMessages(true)
+  }
+}
 
-//   await scrollBottom()
-
-//   const res = await chat({
-//     character_id: characterId,
-//     message: userText
-//   })
-
-//   messages.value.push({
-//     sender_type: 'assistant',
-//     content: res.data.reply
-//   })
-
-//   loading.value = false
-
-//   await scrollBottom()
-
-// }
-
-
-
-/* 流式 */
+/* 发送文字 - 流式 */
 const sendText = async () => {
   if (!input.value.trim()) return
 
@@ -153,11 +205,11 @@ const sendText = async () => {
   await scrollBottom()
 
   console.log('🚀 开始请求流式接口')
-  
+
   let hasError = false
   let errorMessage = ''
   let receivedNormalContent = false
-  let fullResponse = ''  // 记录完整回复用于检测
+  let fullResponse = ''
 
   try {
     await fetchStream("/chat/stream",
@@ -167,42 +219,36 @@ const sendText = async () => {
       },
       (chunk) => {
         console.log('🔥【前端收到chunk】:', chunk)
-        
-        // ========== 检查是否是替换标记 ==========
-        // 格式: [REPLACE]新内容
+
+        // 检查是否是替换标记
         if (chunk.includes('[REPLACE]')) {
           const parts = chunk.split('[REPLACE]')
           const newContent = parts[1] || '抱歉，我无法回答这个问题。'
-          
+
           console.log('🔄 检测到替换标记，替换内容为:', newContent)
-          
-          // 替换整个助手消息
+
           messages.value[msgIndex].content = newContent
           messages.value[msgIndex].isError = true
           messages.value = [...messages.value]
-          
-          // 标记已经处理，不再继续追加
           return
         }
-        
-        // ========== 检查错误信息 ==========
-        if (chunk.includes('[流式回复系统错误:') || 
-            chunk.includes('【系统错误】') ||
-            chunk.includes('[系统错误:') ||
-            chunk.includes('[连接中断'))
-            {
+
+        // 检查错误信息
+        if (chunk.includes('[流式回复系统错误:') ||
+          chunk.includes('【系统错误】') ||
+          chunk.includes('[系统错误:') ||
+          chunk.includes('[连接中断')) {
           hasError = true
           errorMessage = chunk
           console.warn('⚠️ 检测到错误信息:', chunk)
         }
-        
+
         // 正常内容，累加
         fullResponse += chunk
         messages.value[msgIndex].content = fullResponse
         messages.value = [...messages.value]
         scrollBottom()
-        
-        // 标记收到了正常内容
+
         if (chunk.trim() && !chunk.includes('[REPLACE]')) {
           receivedNormalContent = true
         }
@@ -216,12 +262,11 @@ const sendText = async () => {
 
   console.log('🏁 流式请求完成', { hasError, receivedNormalContent, fullResponse })
 
-  // 处理错误情况
   if (hasError || !receivedNormalContent) {
     console.log('❌ 发生错误，更新消息为错误提示')
-    
+
     let friendlyError = '生成失败，请稍后再试'
-    
+
     if (errorMessage.includes('10061') || errorMessage.includes('积极拒绝')) {
       friendlyError = '😴 AI服务未启动，请稍后再试'
     } else if (errorMessage.includes('timeout')) {
@@ -229,7 +274,7 @@ const sendText = async () => {
     } else if (errorMessage.includes('network') || errorMessage.includes('网络')) {
       friendlyError = '📡 网络连接失败，请检查网络'
     }
-    
+
     messages.value[msgIndex].content = friendlyError
     messages.value[msgIndex].isError = true
     messages.value = [...messages.value]
@@ -238,7 +283,6 @@ const sendText = async () => {
   loading.value = false
   await scrollBottom()
 }
-
 
 /* 播放TTS */
 const playTTS = async (text) => {
@@ -254,7 +298,6 @@ const playTTS = async (text) => {
   audioPlayer.play()
 }
 
-
 const stopAudio = () => {
   if (audioPlayer) {
     audioPlayer.pause()
@@ -262,14 +305,12 @@ const stopAudio = () => {
   }
 }
 
-
 /* 语音通话 */
 const startVoiceCall = () => {
   router.push(`/chat/${characterId}/voice`)
 }
 
-
-/* 滚动 */
+/* 滚动到底部 */
 const scrollBottom = async () => {
   await nextTick()
   if (messageBox.value) {
@@ -277,6 +318,10 @@ const scrollBottom = async () => {
   }
 }
 
+// 组件卸载时清理
+onUnmounted(() => {
+  stopAudio()
+})
 </script>
 
 <style scoped>
