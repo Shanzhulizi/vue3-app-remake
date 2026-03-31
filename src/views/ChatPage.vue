@@ -111,18 +111,19 @@ onMounted(async () => {
 const isInitialLoad = ref(true)  // 标记是否首次加载
 const isLoadingMore = ref(false)  // 重命名，避免与 loadingMore 混淆
 let snapshotScrollHeight = 0
-let snapshotScrollTop = 0
+let snapshotScrollTop = ref(0)
+let isRestoringScroll = false  // 防止滚动事件触发加载
 
 const loadHistoryMessages = async (isLoadMore = false) => {
-  if (isLoadingMore.value) return
+  if (loadingMore.value) return
   if (!hasMore.value && isLoadMore) return
 
   if (isLoadMore) {
-    isLoadingMore.value = true
+    loadingMore.value = true
+    isRestoringScroll = true  // 开始恢复滚动
     
-    // ✅ 保存滚动快照
+    // 保存滚动位置
     if (messageBox.value) {
-      snapshotScrollHeight = messageBox.value.scrollHeight
       snapshotScrollTop = messageBox.value.scrollTop
     }
   }
@@ -135,22 +136,26 @@ const loadHistoryMessages = async (isLoadMore = false) => {
       const pagination = res.data.pagination
 
       if (isLoadMore && newMessages.length > 0) {
-        // 插入新消息到顶部
+        // ✅ 记录插入前的高度
+        const oldScrollHeight = messageBox.value?.scrollHeight || 0
+        
+        // 插入新消息
         messages.value = [...newMessages, ...messages.value]
-
+        
         await nextTick()
-
-        // ✅ 恢复滚动位置：新滚动位置 = 原滚动位置 + (新总高度 - 原总高度)
-        if (messageBox.value && snapshotScrollHeight > 0) {
+        
+        // ✅ 计算并恢复滚动位置
+        if (messageBox.value) {
           const newScrollHeight = messageBox.value.scrollHeight
-          const heightIncrease = newScrollHeight - snapshotScrollHeight
-          messageBox.value.scrollTop = snapshotScrollTop + heightIncrease*2
-          console.log(`恢复滚动位置: 原高度=${snapshotScrollHeight}, 新高度=${newScrollHeight}, 增加=${heightIncrease}, 新位置=${snapshotScrollTop + heightIncrease}`)
-          
-          // 清空快照
-          snapshotScrollHeight = 0
-          snapshotScrollTop = 0
+          const heightAdded = newScrollHeight - oldScrollHeight
+          // 注意：这里不需要乘以2，直接加上增加的高度
+          messageBox.value.scrollTop = snapshotScrollTop + heightAdded
         }
+        
+        // 延迟解除恢复标志
+        setTimeout(() => {
+          isRestoringScroll = false
+        }, 100)
       } else {
         messages.value = newMessages
       }
@@ -162,23 +167,36 @@ const loadHistoryMessages = async (isLoadMore = false) => {
     console.error('加载历史消息失败:', error)
   } finally {
     if (isLoadMore) {
-      isLoadingMore.value = false
+      loadingMore.value = false
     }
   }
 }
 
-// 滚动事件处理
+// 修改滚动事件，避免恢复过程中触发加载
 const handleScroll = async (event) => {
-  // ✅ 首次加载时不触发滚动加载
+  // 如果在恢复滚动位置，不触发加载
+  if (isRestoringScroll) return
+  if (loadingMore.value) return
   if (isInitialLoad.value) return
 
   const scrollTop = event.target.scrollTop
-  // 当滚动到顶部附近时加载更多
-  if (scrollTop < 50 && hasMore.value && !isLoadingMore.value && messages.value.length > 0) {
-    console.log('触发加载更多历史消息')
+  if (scrollTop < 50 && hasMore.value && messages.value.length > 0) {
     await loadHistoryMessages(true)
   }
 }
+
+// // 滚动事件处理
+// const handleScroll = async (event) => {
+//   // ✅ 首次加载时不触发滚动加载
+//   if (isInitialLoad.value) return
+
+//   const scrollTop = event.target.scrollTop
+//   // 当滚动到顶部附近时加载更多
+//   if (scrollTop < 50 && hasMore.value && !isLoadingMore.value && messages.value.length > 0) {
+//     console.log('触发加载更多历史消息')
+//     await loadHistoryMessages(true)
+//   }
+// }
 
 /* 发送文字 - 流式 */
 const sendText = async () => {
