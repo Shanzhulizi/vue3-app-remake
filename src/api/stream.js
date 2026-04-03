@@ -33,6 +33,7 @@ export const fetchStream = async (url, data, onMessage) => {
       if (done) break;
 
       const chunk = decoder.decode(value, { stream: true });
+      
       if (chunk.trim()) {
         onMessage(chunk);
       }

@@ -121,7 +121,7 @@ const loadHistoryMessages = async (isLoadMore = false) => {
   if (isLoadMore) {
     loadingMore.value = true
     isRestoringScroll = true  // 开始恢复滚动
-    
+
     // 保存滚动位置
     if (messageBox.value) {
       snapshotScrollTop = messageBox.value.scrollTop
@@ -138,12 +138,12 @@ const loadHistoryMessages = async (isLoadMore = false) => {
       if (isLoadMore && newMessages.length > 0) {
         // ✅ 记录插入前的高度
         const oldScrollHeight = messageBox.value?.scrollHeight || 0
-        
+
         // 插入新消息
         messages.value = [...newMessages, ...messages.value]
-        
+
         await nextTick()
-        
+
         // ✅ 计算并恢复滚动位置
         if (messageBox.value) {
           const newScrollHeight = messageBox.value.scrollHeight
@@ -151,7 +151,7 @@ const loadHistoryMessages = async (isLoadMore = false) => {
           // 注意：这里不需要乘以2，直接加上增加的高度
           messageBox.value.scrollTop = snapshotScrollTop + heightAdded
         }
-        
+
         // 延迟解除恢复标志
         setTimeout(() => {
           isRestoringScroll = false
@@ -237,6 +237,11 @@ const sendText = async () => {
       },
       (chunk) => {
         console.log('🔥【前端收到chunk】:', chunk)
+
+        if (chunk.includes('[DONE]')) {
+          loading.value = false
+          return
+        }
 
         // 检查是否是替换标记
         if (chunk.includes('[REPLACE]')) {
@@ -344,5 +349,4 @@ onUnmounted(() => {
 
 <style scoped>
 @import '@/assets/styles/pages/chatPage.css';
-
 </style>
