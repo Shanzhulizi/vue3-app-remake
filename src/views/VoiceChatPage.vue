@@ -103,6 +103,9 @@ const mediaRecorder = ref(null)
 const audioChunks = ref([])
 const silenceTimer = ref(null)
 
+// ✅ 全局音频对象（防止被垃圾回收）
+let currentAudio = null
+
 const avatarChar = computed(() => character.value.name?.[0] || '?')
 const statusIcon = computed(() => {
   if (isProcessing.value) return '⌛'
@@ -134,8 +137,13 @@ const endCall = () => {
   if (mediaRecorder.value && mediaRecorder.value.state === 'recording') {
     mediaRecorder.value.stop()
   }
+  if (currentAudio) {
+    currentAudio.pause()
+    currentAudio = null
+  }
   isRecording.value = false
   isProcessing.value = false
+  isSpeaking.value = false
   router.push(`/chat/${characterId}`)
 }
 
@@ -236,6 +244,9 @@ const sendVoiceMessage = async (audioBlob) => {
     })
     scrollToBottom()
     
+    // ==============================
+    // ✅ 修复：自动播放音频（你缺失的核心）
+    // ==============================
     if (response.data.audio_url) {
       processingText.value = '播放语音'
       await playAudio(response.data.audio_url)
@@ -253,29 +264,35 @@ const sendVoiceMessage = async (audioBlob) => {
   }
 }
 
-// 播放音频
-const playAudio = (audioUrl) => {
-  return new Promise((resolve) => {
-    const audio = new Audio(audioUrl)
+// ==============================
+// ✅ 修复：播放音频（保证能自动播放）
+// ==============================
+const playAudio = async (audioUrl) => {
+  try {
+    if (currentAudio) {
+      currentAudio.pause()
+      currentAudio = null
+    }
+
     isSpeaking.value = true
+    currentAudio = new Audio(audioUrl)
     
-    audio.onended = () => {
+    currentAudio.onended = () => {
       isSpeaking.value = false
-      resolve()
+      currentAudio = null
     }
     
-    audio.onerror = () => {
-      console.error('播放失败')
+    currentAudio.onerror = (err) => {
+      console.error('播放失败', err)
       isSpeaking.value = false
-      resolve()
+      currentAudio = null
     }
-    
-    audio.play().catch(e => {
-      console.warn('播放被阻止', e)
-      isSpeaking.value = false
-      resolve()
-    })
-  })
+
+    await currentAudio.play()
+  } catch (e) {
+    console.warn('自动播放被浏览器阻止，尝试手动触发', e)
+    isSpeaking.value = false
+  }
 }
 
 // 滚动到底部
