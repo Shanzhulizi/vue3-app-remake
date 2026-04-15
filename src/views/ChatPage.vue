@@ -64,7 +64,7 @@ import { chat } from '@/api/chat'
 import { tts } from '@/api/voice'
 import { fetchStream } from '@/api/stream'
 import { getCharacterDetail } from '@/api/character'
-import { getHistoryConversation } from '@/api/conversation'
+import { getHistoryConversation ,createConversationWithGreeting } from '@/api/conversation'
 
 const route = useRoute()
 const router = useRouter()
@@ -84,11 +84,45 @@ const pageSize = ref(20)
 const messageBox = ref(null)
 let audioPlayer = null
 let lastScrollHeight = 0  // 用于保持滚动位置
+const conversationId = ref(null)        // 保存会话ID
+let conversationCreated = ref(false)  // 标记是否已创建会话
 
 const avatarChar = computed(() =>
   character.value.name ? character.value.name[0] : '?'
 )
 
+// 创建会话并插入开场白
+const createConversation = async (greeting) => {
+  if (conversationCreated.value) return
+  
+  try {
+    const res = await createConversationWithGreeting(characterId, greeting)
+    
+    if (res.data.code === 200) {
+      conversationId.value = res.data.data.conversation_id
+      conversationCreated.value = true
+      console.log('✅ 会话创建成功，ID:', conversationId.value)
+      
+      
+      
+      // 直接在前端插入开场白
+      messages.value.push({
+        id: `greeting_${Date.now()}`,
+        sender_type: 'assistant',
+        content: greeting,
+        isError: false
+      })
+      
+      
+      
+      return true
+    }
+    return false
+  } catch (error) {
+    console.error('创建会话失败:', error)
+    return false
+  }
+}
 // 获取角色信息和历史消息
 // 组件挂载时
 onMounted(async () => {
@@ -100,6 +134,13 @@ onMounted(async () => {
 
   // ✅ 等待 DOM 更新完成后，滚动到底部
   await nextTick()
+
+  // 3. 如果没有历史消息，创建会话并插入开场白
+  if (messages.value.length === 0 && character.value.greeting) {
+     await createConversation(character.value.greeting)
+ 
+  }
+
   scrollBottom()
 
   // ✅ 延迟一小段时间后，允许滚动加载
@@ -107,6 +148,13 @@ onMounted(async () => {
     isInitialLoad.value = false
   }, 500)
 })
+
+
+
+
+
+
+
 
 const isInitialLoad = ref(true)  // 标记是否首次加载
 const isLoadingMore = ref(false)  // 重命名，避免与 loadingMore 混淆
@@ -233,7 +281,8 @@ const sendText = async () => {
     await fetchStream("/chat/stream",
       {
         character_id: characterId,
-        message: userText
+        message: userText,
+        conversation_id: conversationId.value  // 传递会话ID
       },
       (chunk) => {
         console.log('🔥【前端收到chunk】:', chunk)

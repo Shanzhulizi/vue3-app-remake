@@ -4,12 +4,12 @@
 ========================= */
 
 .sidebar {
-  width: 260px;
+  /* width: 260px; */
   background: #f9fafb;
   border-right: none;
   display: flex;
   flex-direction: column;
-  padding: 20px 12px;
+  padding: 28px 12px;
   backdrop-filter: blur(0px);
   box-shadow: 1px 0 0 0 rgba(0, 0, 0, 0.05);
 }
@@ -25,7 +25,7 @@
 /* 品牌 / Logo - ChatGPT 风格 */
 .brand {
   font-weight: 500;
-  font-size: 16px;
+  font-size: 40px;
   margin-bottom: 28px;
   padding: 0 8px;
   color: #2c3e50;
@@ -48,9 +48,9 @@
 }
 
 .nav-item {
-  padding: 10px 12px;
+  padding: 30px 24px;
   border-radius: 12px;
-  font-size: 14px;
+  font-size: 36px;
   font-weight: 450;
   cursor: pointer;
   color: #5b6e8c;
@@ -85,7 +85,7 @@
 .menu-item {
   padding: 10px 12px;
   border-radius: 12px;
-  font-size: 14px;
+  font-size: 24px;
   cursor: pointer;
   color: #5b6e8c;
   transition: all 0.2s ease;
@@ -118,11 +118,11 @@
   position: absolute;
   top: 0;
   left: calc(100% + 12px);
-  min-width: 140px;
+  min-width: 160px;
   background: #ffffff;
   border: none;
   border-radius: 14px;
-  padding: 6px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -144,8 +144,8 @@
 }
 
 .create-item {
-  padding: 8px 12px;
-  font-size: 14px;
+  padding: 8px 16px;
+  font-size: 26px;
   border-radius: 10px;
   cursor: pointer;
   color: #5b6e8c;
@@ -158,49 +158,4 @@
   color: #1f2a3e;
 }
 
-/* 响应式调整 - 小屏幕时保持优雅 */
-@media (max-width: 768px) {
-  .sidebar {
-    width: 72px;
-    padding: 20px 8px;
-    align-items: center;
-  }
-  
-  .brand {
-    font-size: 0;
-    margin-bottom: 24px;
-    background: none;
-    -webkit-text-fill-color: transparent;
-  }
-  
-  .brand::first-letter {
-    font-size: 20px;
-    background: linear-gradient(135deg, #2c3e50, #3498db);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  
-  .nav-item,
-  .menu-item {
-    justify-content: center;
-    text-align: center;
-    font-size: 0;
-    padding: 10px;
-  }
-  
-  .nav-item::before,
-  .menu-item::before {
-    font-size: 20px;
-    display: block;
-  }
-  
-  .nav-item[data-icon]::before {
-    content: attr(data-icon);
-  }
-  
-  .create-menu {
-    left: 100%;
-    top: -8px;
-  }
-}
+

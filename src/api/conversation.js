@@ -14,3 +14,10 @@ export const getHistoryConversation = (characterId, page = 1, pageSize = 20) => 
     params: { page, page_size: pageSize }
   })
 }
+
+export const createConversationWithGreeting = (characterId, greeting) => {
+  return apiClient.post('/conversation/', {
+    character_id: characterId,
+    greeting: greeting
+  })
+}

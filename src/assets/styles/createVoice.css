@@ -1,0 +1,578 @@
+/* =========================
+   ChatGPT 风格声音创作页 - 淡雅高级
+========================= */
+
+.cosyvoice-container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 48px 40px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+/* 主标题 */
+h1 {
+  text-align: center;
+  color: #1e293b;
+  margin-bottom: 48px;
+  font-size: 36px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  width: 100%;
+}
+
+h2 {
+  color: #1e293b;
+  margin-bottom: 32px;
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+}
+
+/* =========================
+   创建声音区域 - 极简白色卡片
+========================= */
+.create-voice-section {
+  background: #ffffff;
+  border-radius: 32px;
+  padding: 40px 48px;
+  margin-bottom: 48px;
+  border: 1px solid #eef2f6;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.create-voice-section h2 {
+  color: #1e293b;
+  margin-bottom: 36px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.form {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 32px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 500;
+  font-size: 28px;
+  color: #1e293b;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 16px 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 26px;
+  background: #ffffff;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  color: #1e293b;
+}
+
+.form-group textarea {
+  font-size: 24px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #cbd5e1;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.02);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #94a3b8;
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 10px;
+  font-size: 22px;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 8px 16px;
+  border-radius: 40px;
+  display: inline-block;
+}
+
+/* 文件上传区域 */
+.file-upload-area {
+  cursor: pointer;
+}
+
+.upload-placeholder {
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 28px;
+  padding: 48px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.upload-placeholder:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.upload-icon {
+  font-size: 64px;
+  display: block;
+  margin-bottom: 20px;
+  opacity: 0.6;
+}
+
+.upload-placeholder p {
+  margin: 12px 0;
+  color: #475569;
+  font-size: 26px;
+  font-weight: 450;
+}
+
+.upload-placeholder small {
+  color: #94a3b8;
+  font-size: 20px;
+}
+
+/* 音频预览区域 */
+.audio-preview {
+  position: relative;
+  background: #f8fafc;
+  border-radius: 24px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+}
+
+.audio-preview audio {
+  width: 100%;
+  border-radius: 16px;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #ffffff;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-btn:hover {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #e5484d;
+  transform: scale(1.05);
+}
+
+/* 提交按钮 - 深色精致 */
+.submit-btn {
+  width: 100%;
+  padding: 18px;
+  background: #1e293b;
+  color: white;
+  border: none;
+  border-radius: 48px;
+  font-size: 28px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 16px;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: #334155;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.submit-btn:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 结果区域 */
+.result {
+  margin-top: 40px;
+  padding: 32px;
+  border-radius: 28px;
+  background: #f8fafc;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+}
+
+.result.success {
+  border-left: 4px solid #22c55e;
+}
+
+.result h3 {
+  font-size: 28px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: #1e293b;
+}
+
+.result-info {
+  margin: 20px 0;
+  padding: 20px 24px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #eef2f6;
+}
+
+.result-info p {
+  margin: 12px 0;
+  font-size: 24px;
+  color: #475569;
+}
+
+.result-info p strong {
+  color: #1e293b;
+  font-weight: 500;
+  margin-right: 12px;
+}
+
+.result-audio {
+  margin: 24px 0;
+  text-align: center;
+}
+
+.result-audio audio {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 16px;
+}
+
+.create-another-btn {
+  padding: 14px 32px;
+  background: transparent;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  border-radius: 48px;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: 450;
+  transition: all 0.2s ease;
+  width: auto;
+  margin-top: 16px;
+}
+
+.create-another-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #1e293b;
+  transform: translateY(-2px);
+}
+
+/* =========================
+   声音列表区域
+========================= */
+.voice-list-section {
+  width: 100%;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 32px;
+  padding: 40px 36px;
+  border: 1px solid #eef2f6;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.voice-list-section h2 {
+  color: #1e293b;
+  text-align: center;
+  margin-bottom: 40px;
+  font-weight: 500;
+  font-size: 30px;
+}
+
+.voice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 28px;
+}
+
+/* 声音卡片 - 极简风格 */
+.voice-card {
+  background: #ffffff;
+  border-radius: 24px;
+  overflow: hidden;
+  transition: all 0.25s ease;
+  border: 1px solid #eef2f6;
+}
+
+.voice-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.04);
+  border-color: #e2e8f0;
+}
+
+.voice-card-header {
+  background: #f8fafc;
+  padding: 20px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.voice-icon {
+  font-size: 32px;
+  color: #475569;
+}
+
+.voice-card-header h3 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 500;
+  color: #1e293b;
+  flex: 1;
+}
+
+.voice-card-body {
+  padding: 20px;
+}
+
+.voice-card-body p {
+  margin: 8px 0;
+  font-size: 20px;
+  color: #64748b;
+}
+
+.voice-id {
+  font-family: monospace;
+  background: #f1f5f9;
+  padding: 4px 12px;
+  border-radius: 32px;
+  display: inline-block;
+  font-size: 18px;
+  color: #475569;
+}
+
+.voice-duration {
+  color: #64748b;
+  font-size: 20px;
+}
+
+.voice-preview {
+  margin: 16px 0;
+}
+
+.voice-preview audio {
+  width: 100%;
+  border-radius: 16px;
+}
+
+.voice-text-preview {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 20px;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #475569;
+  margin-top: 16px;
+  border: 1px solid #eef2f6;
+}
+
+/* 加载和空状态 */
+.loading {
+  text-align: center;
+  padding: 80px;
+  color: #94a3b8;
+  font-size: 26px;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  border: 2px solid #e2e8f0;
+  border-top-color: #1e293b;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 16px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.empty {
+  text-align: center;
+  padding: 80px;
+  color: #94a3b8;
+}
+
+.empty-icon {
+  font-size: 72px;
+  display: block;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty p {
+  font-size: 26px;
+  margin: 0;
+  color: #64748b;
+}
+
+/* =========================
+   响应式适配
+========================= */
+@media (max-width: 1200px) {
+  .voice-grid {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .cosyvoice-container {
+    padding: 32px 24px;
+  }
+  
+  .create-voice-section {
+    padding: 32px 28px;
+  }
+  
+  .voice-list-section {
+    padding: 32px 24px;
+  }
+  
+  .voice-grid {
+    gap: 20px;
+  }
+  
+  .form-group label {
+    font-size: 24px;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    font-size: 22px;
+    padding: 14px 18px;
+  }
+  
+  .submit-btn {
+    font-size: 24px;
+    padding: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .cosyvoice-container {
+    padding: 24px 16px;
+  }
+  
+  .create-voice-section {
+    padding: 24px 20px;
+  }
+  
+  .voice-list-section {
+    padding: 24px 20px;
+  }
+  
+  .voice-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  h1 {
+    font-size: 30px;
+    margin-bottom: 32px;
+  }
+  
+  h2 {
+    font-size: 24px;
+  }
+  
+  .form-group label {
+    font-size: 20px;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    font-size: 18px;
+    padding: 12px 16px;
+  }
+  
+  .form-group small {
+    font-size: 16px;
+  }
+  
+  .submit-btn {
+    font-size: 20px;
+  }
+  
+  .voice-card-header h3 {
+    font-size: 20px;
+  }
+  
+  .voice-card-body p {
+    font-size: 16px;
+  }
+  
+  .upload-placeholder p {
+    font-size: 20px;
+  }
+  
+  .upload-placeholder small {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .create-voice-section {
+    padding: 20px 16px;
+  }
+  
+  .upload-placeholder {
+    padding: 32px;
+  }
+  
+  .result-info {
+    padding: 12px 16px;
+  }
+  
+  .result-info p {
+    font-size: 18px;
+  }
+  
+  .result h3 {
+    font-size: 22px;
+  }
+  
+  .voice-card-header h3 {
+    font-size: 18px;
+  }
+  
+  .voice-icon {
+    font-size: 24px;
+  }
+}

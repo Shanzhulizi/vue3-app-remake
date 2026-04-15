@@ -1,10 +1,11 @@
 <template>
+  <!-- <Topbar :show-back="false" title="发现" /> -->
   <main class="content">
     <div class="content-inner">
       <h2 class="title">角色推荐</h2>
       
       <div v-if="loading" class="loading">
-        <div class="spinner"></div>
+        <!-- <div class="spinner"></div> -->
         <p>加载推荐中...</p>
       </div>
 
@@ -13,6 +14,7 @@
         <RecommendRow
           type="hot"
           :items="recommendations.hot"
+          :card-width="260"
           title="🔥 热门推荐"
           desc="总热度最高的角色"
           @click-more="goToMore('hot')"
@@ -24,6 +26,7 @@
         <RecommendRow
           type="popular"
           :items="recommendations.popular"
+          :card-width="260"
           title="📈 近期流行"
           desc="最近7天最受欢迎"
           @click-more="goToMore('popular')"
@@ -35,6 +38,7 @@
         <RecommendRow
           type="trending"
           :items="recommendations.trending"
+          :card-width="260"
           title="⚡ 近期飙升"
           desc="最近24小时飙升最快"
           @click-more="goToMore('trending')"
@@ -47,6 +51,7 @@
          
           type="personalized"
           :items="recommendations.personalized"
+          :card-width="260"
           title="🎯 猜你喜欢"
           desc="根据你的偏好推荐"
           @click-more="goToMore('personalized')"
@@ -59,6 +64,7 @@
          
           type="vector"
           :items="recommendations.vector"
+          :card-width="260"
           title="🧠 智能推荐"
           desc="基于向量相似度"
           @click-more="goToMore('vector')"
@@ -71,6 +77,7 @@
           
           type="similar"
           :items="recommendations.similar"
+          :card-width="260"
           title="👥 相似用户喜欢"
           desc="和你品味相投的人也在聊"
           @click-more="goToMore('similar')"
@@ -82,6 +89,7 @@
         <RecommendRow
           type="mix"
           :items="recommendations.mix"
+          :card-width="260"
           title="🎲 混合推荐"
           desc="多种算法综合推荐"
           @click-more="goToMore('mix')"
@@ -99,6 +107,7 @@ import { useRouter } from 'vue-router'
 import { getAllRecommends } from '@/api/recommend'
 import { likeCharacter, unlikeCharacter, batchGetLikeStatus } from '@/api/like'
 import RecommendRow from '@/components/RecommendRow.vue'
+import Topbar from '@/components/Topbar.vue'
 
 const router = useRouter()
 const loading = ref(true)
@@ -208,23 +217,23 @@ onMounted(() => {
 
 <style scoped>
 .content {
-  width: 1900px;
-  /* min-height: 100vh; */
+  width:100%;
   background: #f5f6f8;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
 .content-inner {
-  max-width: 1700px;
+  /* max-width: 1700px; */
+
   margin: 0 auto;
   padding: 24px 32px;
-  width: 100%;
+  width: 80%;
   box-sizing: border-box;
 }
 
 .title {
-  font-size: 28px;
+  font-size: 40px;
   font-weight: 700;
   margin-bottom: 32px;
   color: #1f2937;
@@ -259,7 +268,7 @@ onMounted(() => {
 }
 
 /* 让滚动条在正确的位置 */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .content-inner {
     padding: 16px;
   }
@@ -268,5 +277,5 @@ onMounted(() => {
     font-size: 24px;
     margin-bottom: 24px;
   }
-}
+} */
 </style>

@@ -4,7 +4,6 @@ import LoginPage from "../views/LoginPage.vue";
 import RegisterPage from "../views/RegisterPage.vue";
 import MainLayout from "../layout/MainLayout.vue";
 import DiscoverPage from "../views/home/DiscoverPage.vue";
-import FeedPage from "../views/home/FeedPage.vue";
 import AvatarFXPage from "../views/AvatarFXPage.vue";
 import ProfilePage from "../views/profile/ProfilePage.vue";
 import CreateRole from "../views/create/CreateChar.vue";
@@ -20,7 +19,6 @@ const routes = [
     component: MainLayout,
     children: [
       { path: "", component: DiscoverPage, meta: { showTopbar: true } },
-      { path: "feed", component: FeedPage, meta: { showTopbar: true } },
       { path: "profile", component: ProfilePage, meta: { showTopbar: true } },
       {
         path: "create/role",
@@ -42,9 +40,6 @@ const routes = [
         component: CreateScene,
         meta: { showTopbar: false },
       },
-      // { path: "create/voice", component: CreateVoice, meta: { showTopbar: false } },
-      // { path: "create/voice2", component: CreateVoice2, meta: { showTopbar: false } },
-      // { path: "create/voice3", component: CreateVoice3, meta: { showTopbar: false } },
       {
         path: "create/voice",
         component: CreateVoice,

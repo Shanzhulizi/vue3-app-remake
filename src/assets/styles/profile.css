@@ -1,0 +1,217 @@
+
+.home-root {
+  display: flex;
+  height: 100vh;
+  background: #fafafa;
+  color: #111;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+}
+
+/* ====== 左侧栏 ====== */
+
+/* .sidebar {
+  width: 240px;
+  background: #f5f5f5;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+} */
+
+/* .sidebar-top {
+  padding: 16px;
+}
+
+.brand {
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-item {
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #444;
+}
+
+.nav-item:hover {
+  background: #e5e7eb;
+}
+
+.nav-item.active {
+  background: #e5e7eb;
+  font-weight: 600;
+} */
+
+/* ====== 左下菜单 ====== */
+
+/* .sidebar-bottom {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.menu-item {
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #444;
+}
+
+.menu-item:hover {
+  background: #e5e7eb;
+}
+
+.menu-item.danger {
+  color: #dc2626;
+} */
+
+/* ====== 右侧主体 ====== */
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部栏（你原来的） */
+.topbar {
+  height: 56px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+/* 搜索框 */
+.search-box input {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  outline: none;
+}
+
+/* 用户盒子 */
+.user-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+/* ====== 个人页主体 ====== */
+
+.profile-root {
+  flex: 1;
+  padding: 48px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 顶部信息区 */
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-header .avatar {
+  width: 96px;
+  height: 96px;
+  font-size: 36px;
+}
+
+.username {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.email {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* 统计 */
+.stats {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* 操作按钮 */
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.action-btn {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  cursor: pointer;
+}
+
+.action-btn:hover {
+  background: #f3f4f6;
+}
+
+.action-btn.icon {
+  width: 36px;
+  padding: 0;
+}
+
+/* ====== Tabs ====== */
+
+.profile-tabs {
+  display: flex;
+  gap: 24px;
+  margin-top: 32px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tab {
+  padding: 12px 0;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.tab.active {
+  color: #111;
+  font-weight: 600;
+  border-bottom: 2px solid #111;
+}
+
+/* ====== 内容区 ====== */
+
+.profile-content {
+  padding: 40px 0;
+  color: #6b7280;
+}
+
+.empty {
+  font-size: 14px;
+}

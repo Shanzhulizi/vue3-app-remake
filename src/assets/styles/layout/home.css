@@ -5,13 +5,32 @@
   color: #111827;
 }
 
-.main {
-  flex: 1;
+
+.home-root {
   display: flex;
-  flex-direction: column;
+}
+
+.sidebar {
+  flex: 1 !important; /* 侧边栏占 1.5 份 */
+}
+
+.main {
+  flex: 9 !important;  /* 主内容占 8.5 份，总比例 1.5:8.5 = 15:85 */
+}
+
+.main {
+  /* flex: 1; */
+  display: flex;
+  /* flex-direction: column; */
+  min-width: 0 !important;  /* 关键 */
+  width: 0 !important;      /* 配合 min-width: 0 使用 */
 }
 
 .main > *:last-child {
   flex: 1;
   overflow: auto;
+}
+.main > :only-child {
+  flex: 1;
+  min-height: 0;
 }

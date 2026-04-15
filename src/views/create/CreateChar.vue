@@ -2,87 +2,87 @@
   <div class="create-role">
     <h1>{{ isEdit ? '编辑角色' : '创建角色' }}</h1>
 
-    <div class ="main-content">
-  
+    <div class="main-content">
 
-<!-- 角色头像 -->
-    <section>
-      <label>角色头像</label>
-      <div class="avatar-upload">
-        <div class="avatar-preview" @click="triggerFileInput">
-          <img v-if="avatarUrl" :src="avatarUrl" />
-          <div v-else class="avatar-placeholder">+</div>
+
+      <!-- 角色头像 -->
+      <section>
+        <label>角色头像</label>
+        <div class="avatar-upload">
+          <div class="avatar-preview" @click="triggerFileInput">
+            <img v-if="avatarUrl" :src="avatarUrl" />
+            <div v-else class="avatar-placeholder">+</div>
+          </div>
+          <input type="file" ref="fileInput" accept="image/*" @change="onAvatarChange" style="display: none" />
+          <div class="avatar-tip">点击上传头像</div>
         </div>
-        <input type="file" ref="fileInput" accept="image/*" @change="onAvatarChange" style="display: none" />
-        <div class="avatar-tip">点击上传头像 (建议 200x200)</div>
-      </div>
-    </section>
+      </section>
 
-    <!-- 角色名称 -->
-    <section>
-      <label>角色名称 <span class="required">*</span></label>
-      <input v-model="form.name" type="text" placeholder="例如：哈基米" maxlength="50" />
-    </section>
+      <!-- 角色名称 -->
+      <section>
+        <label>角色名称 <span class="required">*</span></label>
+        <input v-model="form.name" type="text" placeholder="例如：哈基米" maxlength="50" />
+      </section>
 
-    <!-- 角色介绍 -->
-    <section>
-      <label>角色介绍</label>
-      <textarea v-model="form.description" rows="3" placeholder="介绍你的角色的特点和性格（最多500字）" maxlength="500" />
-    </section>
+      <!-- 角色介绍 -->
+      <section>
+        <label>角色介绍</label>
+        <textarea v-model="form.description" rows="3" placeholder="介绍你的角色的特点和性格（最多500字）" maxlength="500" />
+      </section>
 
-    <!-- 背景世界观 -->
-    <section>
-      <label>背景世界观</label>
-      <textarea v-model="form.worldview" rows="5" placeholder="角色所处的世界、经历、背景设定（最多500字）" maxlength="500" />
-    </section>
+      <!-- 背景世界观 -->
+      <section>
+        <label>背景世界观</label>
+        <textarea v-model="form.worldview" rows="5" placeholder="角色所处的世界、经历、背景设定（最多500字）" maxlength="500" />
+      </section>
 
-    <!-- 开场白 -->
-    <section>
-      <label>开场白</label>
-      <input v-model="form.greeting" type="text" placeholder="角色第一次见面会说什么（最多200字）" maxlength="200" />
-    </section>
+      <!-- 开场白 -->
+      <section>
+        <label>开场白</label>
+        <input v-model="form.greeting" type="text" placeholder="角色第一次见面会说什么（最多200字）" maxlength="200" />
+      </section>
 
-    <!-- 类别选择（多选） -->
-    <section>
-      <label>角色类别 <span class="tip">（可多选）</span></label>
-      <div class="categories">
-        <div v-for="category in categories" :key="category.id" class="category-item"
-          :class="{ active: form.category_ids.includes(category.id) }" @click="toggleCategory(category.id)">
-          {{ category.name }}
+      <!-- 类别选择（多选） -->
+      <section>
+        <label>角色类别 <span class="tip">（可多选）</span></label>
+        <div class="categories">
+          <div v-for="category in categories" :key="category.id" class="category-item"
+            :class="{ active: form.category_ids.includes(category.id) }" @click="toggleCategory(category.id)">
+            {{ category.name }}
+          </div>
+          <div v-if="categories.length === 0" class="loading-text">加载类别中...</div>
         </div>
-        <div v-if="categories.length === 0" class="loading-text">加载类别中...</div>
-      </div>
-    </section>
+      </section>
 
-    <!-- 标签选择（多选） -->
-    <section>
-      <label>角色标签 <span class="tip">（可多选）</span></label>
-      <div class="tags">
-        <div v-for="tag in tags" :key="tag.id" class="tag-item" :class="{ active: form.tag_ids.includes(tag.id) }"
-          @click="toggleTag(tag.id)">
-          {{ tag.name }}
+      <!-- 标签选择（多选） -->
+      <section>
+        <label>角色标签 <span class="tip">（可多选）</span></label>
+        <div class="tags">
+          <div v-for="tag in tags" :key="tag.id" class="tag-item" :class="{ active: form.tag_ids.includes(tag.id) }"
+            @click="toggleTag(tag.id)">
+            {{ tag.name }}
+          </div>
+          <div v-if="tags.length === 0" class="loading-text">加载标签中...</div>
         </div>
-        <div v-if="tags.length === 0" class="loading-text">加载标签中...</div>
-      </div>
-    </section>
+      </section>
 
-    <!-- 语音选择 -->
-    <section>
-      <label>角色声音 <span class="required">*</span></label>
-      <div class="voice-select-button">
-        <button type="button" @click="showVoiceModal = true" class="select-voice-btn">
-          {{ selectedVoiceName || '点击选择声音' }}
+      <!-- 语音选择 -->
+      <section>
+        <label>角色声音 <span class="required">*</span></label>
+        <div class="voice-select-button">
+          <button type="button" @click="showVoiceModal = true" class="select-voice-btn">
+            {{ selectedVoiceName || '点击选择声音' }}
+          </button>
+        </div>
+      </section>
+
+      <!-- 提交按钮 -->
+      <div class="form-actions">
+        <button class="cancel-btn" @click="goBack">取消</button>
+        <button class="submit" @click="submit" :disabled="loading">
+          {{ loading ? '提交中...' : (isEdit ? '保存修改' : '创建角色') }}
         </button>
       </div>
-    </section>
-
-    <!-- 提交按钮 -->
-    <div class="form-actions">
-      <button class="cancel-btn" @click="goBack">取消</button>
-      <button class="submit" @click="submit" :disabled="loading">
-        {{ loading ? '提交中...' : (isEdit ? '保存修改' : '创建角色') }}
-      </button>
-    </div>
 
     </div>
 

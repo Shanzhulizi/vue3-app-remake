@@ -3,22 +3,23 @@
     <div class="sidebar-top">
       <div class="brand">AI-Chat</div>
       <!-- 创建（带悬浮子菜单） -->
-      <div class="nav-item create" @mouseenter="openCreate" @mouseleave="closeCreate">
+      <!-- <div class="nav-item create" @mouseenter="openCreate" @mouseleave="closeCreate">
         创建
 
         <div v-show="showCreate" class="create-menu">
           <div class="create-item" @click="create('role')">角色</div>
-          <!-- <div class="create-item" @click="create('scene')">场景</div> -->
-          <!-- <div class="create-item" @click="create('voice')">语音</div>
-          <div class="create-item" @click="create('voice2')">语音2</div>
-          <div class="create-item" @click="create('voice3')">语音3</div> -->
 
 
           <div class="create-item" @click="create('voice')">语音</div>
 
         </div>
-      </div>
+      </div> -->
+
+
       <nav class="nav">
+
+        <div class="nav-item" @click="create('role')">创建角色</div>
+        <div class="nav-item" @click="create('voice')">创建语音</div>
         <div class="nav-item" @click="go('/')">发现</div>
         <!-- <div class="nav-item" @click="go('/feed')">动态</div> -->
         <!--<div class="nav-item" @click="go('/avatarfx')">AvatarFX</div>-->
@@ -61,7 +62,7 @@ const closeCreate = () => {
 }
 const create = (type) => {
   showCreate.value = false
-router.push(`/create/${type}`)
+  router.push(`/create/${type}`)
 }
 
 
@@ -73,4 +74,3 @@ router.push(`/create/${type}`)
 <style scoped>
 @import '@/assets/styles/layout/sidebar.css';
 </style>
-
